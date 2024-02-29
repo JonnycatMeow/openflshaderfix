@@ -446,7 +446,7 @@ class ShaderMacro
 	{
 		// Specify the default glVersion.
 		// We can use compile defines to guess the value that prevents crashes in the majority of cases.
-		return #if (android) "100" #elseif (web) "100" #elseif (mac) "120" #else "100" #end;
+		return #if (android) "100" #elseif (web) "100" #elseif (mac) "410 core" #else "100" #end;
 	}
 
 	/**
@@ -461,8 +461,15 @@ class ShaderMacro
 		if (glVersion == "" || glVersion == null) return processGLSLText(source, getDefaultGLVersion(), isFragment);
 
 		// No processing needed on "compatibility" profile
-		if (StringTools.endsWith(glVersion, " compatibility")) return source;
-		if (StringTools.endsWith(glVersion, " core")) return processGLSLText(source, StringTools.replace(glVersion, " core", ""), isFragment);
+		if (StringTools.endsWith(glVersion, "compatibility")) 
+		{ 
+			return source;
+		}
+			
+		if (StringTools.endsWith(glVersion, "core")) 
+		{ 
+			return processGLSLText(source, StringTools.replace(glVersion, "core", ""), isFragment);
+		}
 
 		// Recall: Attribute values are per-vertex, varying values are per-fragment
 		// Thus, an `out` value in the vertex shader is an `in` value in the fragment shader
@@ -548,8 +555,15 @@ class ShaderMacro
 
 	private static function buildGLSLHeaders(glVersion:String):String
 	{
-		if (StringTools.endsWith(glVersion, " compatibility")) return "";
-		if (StringTools.endsWith(glVersion, " core")) return buildGLSLHeaders(StringTools.replace(glVersion, " core", ""));
+		if (StringTools.endsWith(glVersion, "compatibility"))  
+		{
+			return "";
+		}  
+
+		if (StringTools.endsWith(glVersion, "core")) 
+		{ 
+			return buildGLSLHeaders(StringTools.replace(glVersion, "core", ""));
+		}
 
 		return switch (glVersion)
 		{
@@ -577,8 +591,16 @@ class ShaderMacro
 	private static function buildGLSLExtensions(glExtensions:Array<{name:String, behavior:String}>, glVersion:String,
 			isFragment:Bool):Array<{name:String, behavior:String}>
 	{
-		if (StringTools.endsWith(glVersion, " compatibility")) return glExtensions;
-		if (StringTools.endsWith(glVersion, " core")) return buildGLSLExtensions(glExtensions, StringTools.replace(glVersion, " core", ""), isFragment);
+		if (StringTools.endsWith(glVersion, "compatibility")) 
+		{ 
+            return glExtensions;
+		} 
+			
+		if (StringTools.endsWith(glVersion, "core"))
+		{ 
+			return buildGLSLExtensions(glExtensions, StringTools.replace(glVersion, "core", ""), isFragment);
+		}
+
 
 		switch (glVersion)
 		{
